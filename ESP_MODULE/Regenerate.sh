@@ -44,7 +44,7 @@ do
     echo "}" >> $out_file
     echo "#endif" >> $out_file
     echo "//EOF" >> $out_file
-    ALL_CALL="${ALL_CALL} \ \n server.on(\"/${File_name}\",send_${File_name//${Replase_mask}/_});"
+    ALL_CALL="${ALL_CALL}    \ \n server.on(\"/${File_name}\",send_${File_name//${Replase_mask}/_});"
     # server.on("/style.css",send_style_css);
 done
 echo -e ${ALL_INCLUDES}>> ${main_include}

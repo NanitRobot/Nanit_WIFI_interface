@@ -104,14 +104,74 @@
           title: "Voltage",
           label: "mV"
         });
+  
+        function get_Voltage() {
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+              // document.getElementById("text_wifi").innerHTML = this.responseText;
+              Voltage.refresh(this.responseText);
+            }
+          };
+          xhttp.open("GET", "Voltage", true);
+          xhttp.send();
+        }
+
+        function get_Power() {
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+              // document.getElementById("text_wifi").innerHTML = this.responseText;
+              Power.refresh(this.responseText);
+            }
+          };
+          xhttp.open("GET", "Power", true);
+          xhttp.send();
+        }
+
+        function get_Humidity() {
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+              // document.getElementById("text_wifi").innerHTML = this.responseText;
+              humidity.refresh(this.responseText);
+            }
+          };
+          xhttp.open("GET", "Humidity", true);
+          xhttp.send();
+        }
+
+        function get_CO() {
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+              // document.getElementById("text_wifi").innerHTML = this.responseText;
+              CO.refresh(this.responseText);
+            }
+          };
+          xhttp.open("GET", "CO", true);
+          xhttp.send();
+        }
+
+        function get_Temp() {
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+              // document.getElementById("text_wifi").innerHTML = this.responseText;
+              temp.refresh(this.responseText);
+            }
+          };
+          xhttp.open("GET", "Temp", true);
+          xhttp.send();
+        }
 
         setInterval(function () {
-          temp.refresh(getRandomInt(-30, 45));
-          humidity.refresh(getRandomInt(25, 90));
-          CO.refresh(getRandomInt(350, 1500));
-          Power.refresh(getRandomInt(0, 100));
-          Voltage.refresh(getRandomInt(3200, 4200));
-        }, 2500);
+          get_Voltage();
+          get_Temp();
+          get_CO();
+          get_Humidity();
+          get_Power();
+        }, 400);
       };
     </script>
     <!-- 
