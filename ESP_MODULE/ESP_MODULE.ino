@@ -48,6 +48,7 @@ String serialNumber = "0x0000000";
 #include "config_connect.h"
 
 int i;
+#include "all_pages.h"
 void HomePage()
 {
   BLUE_ON();
@@ -261,6 +262,7 @@ void setup(void)
   pinMode(PushButton,INPUT_PULLUP);
   while (1)
   {
+    break;
     if(millis()>30000 or ! digitalRead(PushButton)){
       serialNumber="XXXXXXXXXX";
       break;
@@ -351,6 +353,7 @@ void setup(void)
   server.onNotFound([]() {
     HomePage();
   });
+  SERVER_ON_ALL
   server.on("/", HomePage); //start page
   server.on("/setting", SettingPage); //peripheral setup page
   server.on("/gamePad", GamePadPage); //joystick page
