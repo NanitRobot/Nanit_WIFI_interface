@@ -9,7 +9,7 @@ const char SmartHome_html[] PROGMEM = R"=====(
 <html>
 
 <head>
-  <title>NANIT CMArt home</title>
+  <title>NANIT HOME CONTROL</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <link href="style.css" rel="stylesheet" />
 </head>
