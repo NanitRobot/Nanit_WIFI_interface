@@ -51,6 +51,10 @@ String serialNumber = "0x0000000";
 int i;
 #include "all_pages.h"
 
+bool convertStringToBool(const String& str) {
+    return str == "true" || str == "1" || str == "yes";
+}
+
 void SettingPage()
 {
     BLUE_ON();
@@ -202,6 +206,22 @@ void handleSlider() {
   Serial.println(openButtonState);*/
   server.send(200, "text/plain", "OK");
   BLUE_OFF();
+}
+
+/**
+ * @brief Функція обробляє запити з сторінки керування будинком
+ * 
+ */
+void handleHoseControl(){
+  /*
+  Можливий варіант використання
+  Від сторінки "прилітають" п'ять змінних(див приклад) вони маєть булевий тип
+  Serial.print(convertStringToBool(server.arg("manual_control")));
+  Serial.print(convertStringToBool(server.arg("Fan")));
+  Serial.print(convertStringToBool(server.arg("Window")));
+  Serial.print(convertStringToBool(server.arg("LED")));
+  Serial.println(convertStringToBool(server.arg("Gate")));
+  */
 }
 
 void re_name_ssid() {                         //ssid change
@@ -371,6 +391,8 @@ void setup(void)
   server.on("/Humidity", []() { server.send(200, "text/plane", "40"); });
   server.on("/CO", []() { server.send(200, "text/plane", "400"); });//< У ppm (350-1800)
   server.on("/Temp", []() { server.send(200, "text/plane", "-25"); });//< температура (-50-+50)
+// Контроль
+  server.on("/HouseControl",handleHoseControl);
 /*****************************************************************/
   server.on("/b_left", button_left); //control with the left joystick buttons
   server.on("/b_right", button_right); //control with the right joystick buttons

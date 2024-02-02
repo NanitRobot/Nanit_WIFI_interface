@@ -205,7 +205,7 @@ const char SmartHome_html[] PROGMEM = R"=====(
           <td>
             <div class="buttons_game">
               <label class="switch">
-                <input type="checkbox" id="manual_control" value="1">
+                <input onclick="send_ButtonsValues()" type="checkbox" id="manual_control" value="1">
                 <span class="slider round"></span>
               </label>
             </div>
@@ -220,7 +220,7 @@ const char SmartHome_html[] PROGMEM = R"=====(
 -------------------------------------------------------------------------------
             -->
         <tr>
-          <td colspan="3"><center><div class="buttons_game">Light</div></center></td>
+          <td colspan="3"><center><div class="buttons_game">Fan</div></center></td>
         </tr>
         <tr>
           <td>
@@ -229,7 +229,7 @@ const char SmartHome_html[] PROGMEM = R"=====(
           <td>
             <div class="buttons_game">
               <label class="switch">
-                <input type="checkbox" id="Fan" value="1">
+                <input onclick="send_ButtonsValues()" type="checkbox" id="Fan" value="1">
                 <span class="slider round"></span>
               </label>
             </div>
@@ -253,7 +253,7 @@ const char SmartHome_html[] PROGMEM = R"=====(
           <td>
             <div class="buttons_game">
               <label class="switch">
-                <input type="checkbox" id="Window" value="1">
+                <input onclick="send_ButtonsValues()" type="checkbox" id="Window" value="1">
                 <span class="slider round"></span>
               </label>
             </div>
@@ -277,7 +277,7 @@ const char SmartHome_html[] PROGMEM = R"=====(
         <td>
           <div class="buttons_game">
             <label class="switch">
-              <input type="checkbox" id="LED" value="1">
+              <input onclick="send_ButtonsValues()" type="checkbox" id="LED" value="1">
               <span class="slider round"></span>
             </label>
           </div>
@@ -301,7 +301,7 @@ const char SmartHome_html[] PROGMEM = R"=====(
         <td>
           <div class="buttons_game">
             <label class="switch">
-              <input type="checkbox" id="Gate" value="1">
+              <input onclick="send_ButtonsValues()" type="checkbox" id="Gate" value="1">
               <span class="slider round"></span>
             </label>
           </div>
@@ -318,6 +318,13 @@ const char SmartHome_html[] PROGMEM = R"=====(
       </tbody>
     </table>
   </center>
+  <script>
+    function send_ButtonsValues() {
+      const xhttp = new XMLHttpRequest();
+      xhttp.open('GET', `/HouseControl?manual_control=${document.getElementById('manual_control').checked}&Fan=${document.getElementById('Fan').checked}&Window=${document.getElementById('Window').checked}&LED=${document.getElementById('LED').checked}&Gate=${document.getElementById('Gate').checked}`, true);
+      xhttp.send();
+    }
+  </script>
 </body>
 
 </html>)=====";
