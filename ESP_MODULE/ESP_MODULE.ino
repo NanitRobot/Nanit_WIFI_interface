@@ -37,7 +37,8 @@ ESP8266WebServer server(80); //
 
 String serialNumber = "0x0000000";
 
-#include "index.h"                //connecting HTML pages
+
+                      //connecting HTML pages
 #include "setting.h"
 #include "gamepad.h"
 #include "gamepad_simple.h"
@@ -48,11 +49,10 @@ String serialNumber = "0x0000000";
 #include "config_connect.h"
 
 int i;
-void HomePage()
-{
-  BLUE_ON();
-  server.send(200, "text/html", webpageHome);   //Main page
-  BLUE_OFF();
+#include "all_pages.h"
+
+bool convertStringToBool(const String& str) {
+    return str == "true" || str == "1" || str == "yes";
 }
 
 void SettingPage()
@@ -208,6 +208,22 @@ void handleSlider() {
   BLUE_OFF();
 }
 
+/**
+ * @brief Функція обробляє запити з сторінки керування будинком
+ * 
+ */
+void handleHoseControl(){
+  /*
+  Можливий варіант використання
+  Від сторінки "прилітають" п'ять змінних(див приклад) вони маєть булевий тип
+  Serial.print(convertStringToBool(server.arg("manual_control")));
+  Serial.print(convertStringToBool(server.arg("Fan")));
+  Serial.print(convertStringToBool(server.arg("Window")));
+  Serial.print(convertStringToBool(server.arg("LED")));
+  Serial.println(convertStringToBool(server.arg("Gate")));
+  */
+}
+
 void re_name_ssid() {                         //ssid change
   if (server.arg("rename_ssid") != "") {
 
@@ -349,14 +365,16 @@ void setup(void)
 
   dnsServer.start(DNS_PORT, "*", apIP);
   server.onNotFound([]() {
-    HomePage();
+    send_index_html();
   });
-  server.on("/", HomePage); //start page
+  SERVER_ON_ALL
+  server.on("/", send_index_html); //start page
   server.on("/setting", SettingPage); //peripheral setup page
   server.on("/gamePad", GamePadPage); //joystick page
   server.on("/gamePadSimple", GamePadSimple); //simple joystick page
   server.on("/terminal", TerminalPage); //terminal page
   server.on("/config", ConfigPage); //peripheral connection page
+  server.on("/SmartHome", send_SmartHome_html);
 
 /*****************************************************************/
   server.on("/joystick", handleJoystick);
@@ -364,6 +382,18 @@ void setup(void)
   server.on("/slider", handleSlider);  // Обробник для слайдера
 /*****************************************************************/
 
+/*****************************************************************/
+// Моніторинг 
+//! @note всі індикатори приймають \b лише цілочиселні значення
+//! які карще конвертувати у рядкові
+  server.on("/Voltage", []() { server.send(200, "text/plane", "3300"); });//< в мілівольтах (3200-4200)
+  server.on("/Power", []() { server.send(200, "text/plane", "90"); });//< у %
+  server.on("/Humidity", []() { server.send(200, "text/plane", "40"); });
+  server.on("/CO", []() { server.send(200, "text/plane", "400"); });//< У ppm (350-1800)
+  server.on("/Temp", []() { server.send(200, "text/plane", "-25"); });//< температура (-50-+50)
+// Контроль
+  server.on("/HouseControl",handleHoseControl);
+/*****************************************************************/
   server.on("/b_left", button_left); //control with the left joystick buttons
   server.on("/b_right", button_right); //control with the right joystick buttons
 
