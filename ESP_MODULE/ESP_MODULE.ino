@@ -216,12 +216,17 @@ void handleHoseControl(){
   /*
   Можливий варіант використання
   Від сторінки "прилітають" п'ять змінних(див приклад) вони маєть булевий тип
-  Serial.print(convertStringToBool(server.arg("manual_control")));
-  Serial.print(convertStringToBool(server.arg("Fan")));
-  Serial.print(convertStringToBool(server.arg("Window")));
-  Serial.print(convertStringToBool(server.arg("LED")));
-  Serial.println(convertStringToBool(server.arg("Gate")));
   */
+  Serial.print(convertStringToBool(server.arg("manual_control")));
+  Serial.print(", ");
+  Serial.print(convertStringToBool(server.arg("Fan")));
+  Serial.print(", ");
+  Serial.print(convertStringToBool(server.arg("Window")));
+  Serial.print(", ");
+  Serial.print(convertStringToBool(server.arg("LED")));
+  Serial.print(", ");
+  Serial.println(convertStringToBool(server.arg("Gate")));
+  
 }
 
 void re_name_ssid() {                         //ssid change
