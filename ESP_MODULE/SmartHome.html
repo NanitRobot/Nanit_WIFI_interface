@@ -80,8 +80,8 @@
         var CO = new JustGage({
           id: "CO",
           value: getRandomInt(350, 1500),
-          min: 350,
-          max: 1800,
+          min: 1,
+          max: 2000,
           title: "C02",
           label: "ppm"
         });
@@ -99,70 +99,70 @@
         var Voltage = new JustGage({
           id: "Voltage",
           value: getRandomInt(3190, 4210),
-          min: 3190,
-          max: 4210,
+          min: 2500,
+          max: 4500,
           title: "Voltage",
           label: "mV"
         });
   
         function get_Voltage() {
           var xhttp = new XMLHttpRequest();
+          xhttp.open("GET", "Voltage", true);
+          xhttp.send();
           xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
               // document.getElementById("text_wifi").innerHTML = this.responseText;
               Voltage.refresh(this.responseText);
             }
           };
-          xhttp.open("GET", "Voltage", true);
-          xhttp.send();
         }
 
         function get_Power() {
           var xhttp = new XMLHttpRequest();
+          xhttp.open("GET", "Power", true);
+          xhttp.send();
           xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
               // document.getElementById("text_wifi").innerHTML = this.responseText;
               Power.refresh(this.responseText);
             }
           };
-          xhttp.open("GET", "Power", true);
-          xhttp.send();
         }
 
         function get_Humidity() {
           var xhttp = new XMLHttpRequest();
+          xhttp.open("GET", "Humidity", true);
+          xhttp.send();
           xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
               // document.getElementById("text_wifi").innerHTML = this.responseText;
               humidity.refresh(this.responseText);
             }
           };
-          xhttp.open("GET", "Humidity", true);
-          xhttp.send();
         }
 
         function get_CO() {
           var xhttp = new XMLHttpRequest();
+          xhttp.open("GET", "CO", true);
+          xhttp.send();
           xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
               // document.getElementById("text_wifi").innerHTML = this.responseText;
               CO.refresh(this.responseText);
             }
           };
-          xhttp.open("GET", "CO", true);
-          xhttp.send();
         }
 
         function get_Temp() {
           var xhttp = new XMLHttpRequest();
+          xhttp.open("GET", "Temp", true);
+          xhttp.send();
           xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
               // document.getElementById("text_wifi").innerHTML = this.responseText;
               temp.refresh(this.responseText);
             }
           };
-          xhttp.open("GET", "Temp", true);
-          xhttp.send();
         }
 
         setInterval(function () {
@@ -171,7 +171,7 @@
           get_CO();
           get_Humidity();
           get_Power();
-        }, 400);
+        }, 1000);
       };
     </script>
     <!-- 

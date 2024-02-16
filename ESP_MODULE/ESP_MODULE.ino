@@ -48,6 +48,7 @@ String serialNumber = "0x0000000";
 #include "setting_gamepad.h" 
 #include "config_connect.h"
 
+  const char _separator[]=", ";
 int i;
 #include "all_pages.h"
 
@@ -167,11 +168,11 @@ void handleJoystick() {
   xValue = server.arg("x").toInt();
   yValue = server.arg("y").toInt();
   Serial.print(xValue);
-  Serial.print(",");
+  Serial.print(_separator);
   Serial.print(yValue);
-  Serial.print(",");
+  Serial.print(_separator);
   Serial.print(sliderValue);
-  Serial.print(",");
+  Serial.print(_separator);
   Serial.println(bValue);
   server.send(200, "text/plain", "OK");
   BLUE_OFF();
@@ -216,12 +217,18 @@ void handleHoseControl(){
   /*
   Можливий варіант використання
   Від сторінки "прилітають" п'ять змінних(див приклад) вони маєть булевий тип
-  Serial.print(convertStringToBool(server.arg("manual_control")));
-  Serial.print(convertStringToBool(server.arg("Fan")));
-  Serial.print(convertStringToBool(server.arg("Window")));
-  Serial.print(convertStringToBool(server.arg("LED")));
-  Serial.println(convertStringToBool(server.arg("Gate")));
   */
+  // Serial.print("SHC, ");
+  Serial.print(convertStringToBool(server.arg("manual_control")));
+  Serial.print(_separator);
+  Serial.print(convertStringToBool(server.arg("Fan")));
+  Serial.print(_separator);
+  Serial.print(convertStringToBool(server.arg("Window")));
+  Serial.print(_separator);
+  Serial.print(convertStringToBool(server.arg("LED")));
+  Serial.print(_separator);
+  Serial.println(convertStringToBool(server.arg("Gate")));
+  
 }
 
 void re_name_ssid() {                         //ssid change
@@ -256,6 +263,15 @@ void re_name_password() {           //password change
   else if (server.arg("rename_password") == "")Serial.println("Not select_password");
 }
 constexpr uint8_t PushButton= 4;
+
+int mVolts = 4000,  ///<
+    Bat_Power = 15, ///<
+    Humidity = 75,  ///<
+    C_O = 1200,     ///<
+    temp = -15;      ///<
+long long last_get_sensors = 0;
+const auto interval=500;
+
 void setup(void)
 {
   RED_ON();
@@ -277,7 +293,7 @@ void setup(void)
   pinMode(PushButton,INPUT_PULLUP);
   while (1)
   {
-    if(millis()>30000 or ! digitalRead(PushButton)){
+    if(millis()>5000 or ! digitalRead(PushButton)){
       serialNumber="XXXXXXXXXX";
       break;
     }
@@ -374,7 +390,7 @@ void setup(void)
   server.on("/gamePadSimple", GamePadSimple); //simple joystick page
   server.on("/terminal", TerminalPage); //terminal page
   server.on("/config", ConfigPage); //peripheral connection page
-  server.on("/SmartHome", send_SmartHome_html);
+  server.on("/SmartHome",[](){send_SmartHome_html();last_get_sensors=millis()+interval;} );
 
 /*****************************************************************/
   server.on("/joystick", handleJoystick);
@@ -386,11 +402,12 @@ void setup(void)
 // Моніторинг 
 //! @note всі індикатори приймають \b лише цілочиселні значення
 //! які карще конвертувати у рядкові
-  server.on("/Voltage", []() { server.send(200, "text/plane", "3300"); });//< в мілівольтах (3200-4200)
-  server.on("/Power", []() { server.send(200, "text/plane", "90"); });//< у %
-  server.on("/Humidity", []() { server.send(200, "text/plane", "40"); });
-  server.on("/CO", []() { server.send(200, "text/plane", "400"); });//< У ppm (350-1800)
-  server.on("/Temp", []() { server.send(200, "text/plane", "-25"); });//< температура (-50-+50)
+
+  server.on("/Voltage", []() { server.send(200, "text/plane", String(mVolts)); last_get_sensors=millis()+interval; });//< в мілівольтах (3200-4200)
+  server.on("/Power", []() { server.send(200, "text/plane", String(Bat_Power)); last_get_sensors=millis()+interval;});//< у %
+  server.on("/Humidity", []() { server.send(200, "text/plane", String(Humidity));last_get_sensors=millis()+interval; });
+  server.on("/CO", []() { server.send(200, "text/plane", String(C_O)); last_get_sensors=millis()+interval;});//< У ppm (350-1800)
+  server.on("/Temp", []() { server.send(200, "text/plane", String(temp)); last_get_sensors=millis()+interval;});//< температура (-50-+50)
 // Контроль
   server.on("/HouseControl",handleHoseControl);
 /*****************************************************************/
@@ -449,6 +466,49 @@ void Comand_Nanit(String value) {
 
 void Nanit_UART()
 {
+  if (0 != Serial.available()){
+    if (last_get_sensors<millis()) 
+    /* парсимо датчики*/
+    {
+      enum {
+        SENSOR_TEMP = 0,  // temp
+        SENSOR_HUM,       //
+        SENSOR_GAS,       ///<
+        SENSOR_POWER,     ///<
+        SENSOR_VOLTAGE,   ///<
+        SENSOR_LAST       ///<
+      };
+      String input_string = Serial.readStringUntil(
+          '\n'); /** < Читаємо до символу завершення рядка */
+      char *str = strdup(input_string.c_str());
+      char *token = strtok(str, _separator); /** < виділяємо перший елемент що
+                                      закінчується комою або до кінця рядка */
+      byte index = 0; /** < лічильник елементів */
+      int values[SENSOR_LAST]; /** < оргінзуємо масив для зберігання чисел */
+      while ((NULL != token) &&
+             (index < SENSOR_LAST)) /**  < Повторюватимемо дії поки не
+                                      закінчиться рядок або місце у масиві */
+      {
+        values[index++] =
+            atoi(token); /** < шукаємо числа у рядку, якщо знаходимо занписуємо
+                            у першу комірку і одразу перводимо вказівник на
+                            наступну комірку */
+        token = strtok(NULL, _separator); /** < шукаємо цифри у до наступної коми */
+      }
+      /** Якщо ми щось записали в масив присвоюємо ці значення змінним для
+       * подальшого*/
+      mVolts = values[SENSOR_VOLTAGE];
+      Bat_Power = values[SENSOR_POWER];
+      Humidity = values[SENSOR_HUM];
+      C_O = values[SENSOR_GAS];
+      temp = values[SENSOR_TEMP];
+    }
+    else
+    /* парсимо команди */
+    {}
+  }
+
+  #if 0
   if (Serial.available()) //if data is coming
   {
     bufer_TX = Serial.read();
@@ -476,6 +536,7 @@ void Nanit_UART()
     terminal += "\n";
     byfer_UART.remove(0);
   }
+  #endif
 }
 
 void loop(void)
